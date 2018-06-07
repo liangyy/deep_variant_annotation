@@ -1,3 +1,16 @@
+## Quick Start
+
+```
+## do this on RCC
+$ cd /project2/xinhe/yanyul
+$ source setup.sh
+$ source activate deepvarpred_test
+$ cd path_to_this_repo
+$ snakemake --configfile config.test.yaml -p
+## check output 
+$ ls output/my-test/
+```
+
 ## Input format
 
 See `test_var.txt` as an example.
