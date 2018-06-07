@@ -5,7 +5,7 @@ parser = argparse.ArgumentParser(prog='var2seq_check.py', description='''
 parser.add_argument('--input')
 parser.add_argument('--output_prefix')
 parser.add_argument('--length_before', type = int)
-parser.add_argument('--length_after'. type = int)
+parser.add_argument('--length_after', type = int)
 parser.add_argument('--ifcheck', type = bool)
 args = parser.parse_args()
 
@@ -20,15 +20,15 @@ if args.ifcheck == True:
         for line in f:
             line = line.strip()
             line = line.split('\t')
-            seq = line[0]
-            name = line[1]
-            (chrm, start, end, a1, a2, strand) = name.split('-')
-            ref_char = seq[length_before].upper()
+            seq = line[1]
+            name = line[0]
+            (chrm, start, end, a1, a2) = name.split('@')
+            ref_char = seq[args.length_before].upper()
             if ref_char != a1.upper():
-                bad_out.write('\t'.join((chrm, start, end, a1, a2, strand, 'ref_char={ref_char}'.format(ref_char = ref_char))) + '\n')
+                bad_out.write('\t'.join((chrm, start, end, a1, a2, 'ref_char={ref_char}'.format(ref_char = ref_char))) + '\n')
             else:
                 good_ref_out.write('\t'.join((seq, name)) + '\n')
-                good_alt_out.write('\t'.join(seq[:args.length_before] + a2 + seq[args.length_after:], name) + '\n')
+                good_alt_out.write('\t'.join((seq[:args.length_before] + a2 + seq[args.length_after:], name)) + '\n')
 elif args.ifcheck == False:
     with open(args.input, 'r') as f:
         for line in f:
@@ -36,7 +36,7 @@ elif args.ifcheck == False:
             line = line.split('\t')
             seq = line[0]
             name = line[1]
-            (chrm, start, end, a1, a2, strand) = name.split('-')
+            (chrm, start, end, a1, a2) = name.split('@')
             ref_char = seq[length_before].upper()
             good_ref_out.write('\t'.join((seq, name)) + '\n')
             good_alt_out.write('\t'.join(seq[:args.length_before] + a2 + seq[args.length_after:], name) + '\n')

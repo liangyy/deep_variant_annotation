@@ -26,8 +26,9 @@ def mySubprocess(cmd, debug):
 import numpy as np
 import os
 import h5py
+import gzip
 
-cmd = '''cat {file} | wc -l'''.format(file=args.seq_file)
+cmd = '''zcat {file} | wc -l'''.format(file=args.seq_file)
 length = mySubprocess(cmd, args.debug)
 if args.debug is True:
     sys.exit()
@@ -35,7 +36,7 @@ huge_array = np.zeros((int(length), args.window, 4), np.bool_)
 encode = {'A': 0, 'T': 3, 'G': 1, 'C': 2}
 
 counter = 0
-with open(args.seq_file) as infile:
+with gzip.open(args.seq_file, 'rt') as infile:
     for line in infile:
         seq = line.strip().split('\t')[0].upper()
         digit_seq = np.zeros((args.window, 4))

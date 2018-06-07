@@ -11,6 +11,9 @@ parser.add_argument('--score_alt', help='''
 parser.add_argument('--var', help='''
 	List of variants which are input to input2score.py
 ''')
+parser.add_argument('--label_idx', type = int, help='''
+        Index of output label (1-based)
+''')
 parser.add_argument('--output')
 args = parser.parse_args()
 
@@ -24,7 +27,9 @@ def read_data(filename):
     return yp
 
 yref = read_data(args.score_ref)
+yref = yref[:, args.label_idx - 1]
 yalt = read_data(args.score_alt)
+yalt = yalt[:, args.label_idx - 1]
 
 o = gzip.open(args.output, 'wt')
 
@@ -35,9 +40,9 @@ with gzip.open(args.var, 'rt') as f:
         line = line.split('\t')
         seq = line[0]
         name = line[1]
-        (chrm, start, end, a1, a2, strand) = name.split('-')
+        (chrm, start, end, a1, a2) = name.split('@')
         ref = yref[i]
         alt = yalt[i]
         i += 1
-        o.write('\t'.join((chrm, start, end, a1, a2, strand, str(ref), str(alt))))
+        o.write('\t'.join((chrm, start, end, a1, a2, str(ref), str(alt))) + '\n')
 o.close()

@@ -9,7 +9,14 @@
 # 2. sequence --> input (HDF5 one-hot coding of sequence)
 # 3. input --> score
 # 4. score --> output (chr  pos0 pos1  a1  a2  score1  score2)
-# input format: chr  pos0 pos1  a1  a2  strand (delimiter = '\t')
+# input format: chr  pos0 pos1  a1  a2 (delimiter = '\t', allele is relative to reference)
+
+
+rule all:
+    input:
+        [ 'output/{name}/output__{label}.bed.gz'.format(name = config['out_prefix'], label = l) for l in list(config['pred_model']['label']) ]
+
+
 
 design = config['design'].split('-')
 chunk_before = int(design[0])
@@ -26,16 +33,16 @@ rule var2seq_var2region:
     shell:
         '''
         cat {input[0]} | awk -F"\t" -v OFS="\t" '{{
-            if($6=='+') {{
-                start=$2-{wildcards.chunk_before};
-                end=$3+{wildcards.chunk_after}
-            }}
-            else if($6 == '-') {{
-                start=$2-{wildcards.chunk_after};
-                end=$3+{wildcards.chunk_before}
-            }}
-            name=$1"-"$2"-"$3"-"$4"-"$5"-"$6
-            print $1,start,end,name,$5,$6
+            # if($6=="+") {{
+            start=$2-{chunk_before};
+            end=$3+{chunk_after};
+            # }}
+            # else if($6=="-") {{
+            #     start=$2-{chunk_after};
+            #     end=$3+{chunk_before}
+            # }}
+            name=$1"@"$2"@"$3"@"$4"@"$5;
+            print $1,start,end,name,$5
         }}' > {output[0]}
         '''
 
@@ -48,7 +55,7 @@ rule var2seq_region2seq:
     log:
         'output/{name}/region2seq.log'
     shell:
-        'bedtools getfasta -fi {input[1]} -bed {input[0]} -fo {output[0]} -name -tab -s'
+        'bedtools getfasta -fi {input[1]} -bed {input[0]} -fo {output[0]} -name -tab 2> {log}'
 
 rule var2seq_check:
     input:
@@ -63,8 +70,8 @@ rule var2seq_check:
         'python scripts/var2seq_check.py \
             --input {input[0]} \
             --output_prefix output/{wildcards.name}/check \
-            --length_before {wildcards.chunk_before} \
-            --length_after {wildcards.chunk_after} \
+            --length_before {chunk_before} \
+            --length_after {chunk_after} \
             --ifcheck {params.ifcheck}'
 
 rule seq2input:
@@ -82,14 +89,24 @@ rule input2score:
     output:
         temp('output/{name}/raw_score.{type}.hdf5')
     shell:
-        'python input2score.py --data {input[0]} --model {input[1]} --output {output[0]}'
+        'python scripts/input2score.py --data {input[0]} --model {input[1]} --output {output[0]}'
 
 rule score2output:
     input:
         'output/{name}/raw_score.REF.hdf5',
-        'output/{name}/raw_score.ALT.hdf5'
+        'output/{name}/raw_score.ALT.hdf5',
         'output/{name}/check.passed.REF.tab.gz'
     output:
         'output/{name}/output__{label}.bed.gz'
+    params:
+        idx = lambda wildcards: config['pred_model']['label'][wildcards.label]
     shell:
-        'python scripts/score2output.py --score_ref {input[0]} --score_alt {input[1]} --var {input[3]} --output {output[0]}'
+        '''
+        python scripts/score2output.py \
+            --score_ref {input[0]} \
+            --score_alt {input[1]} \
+            --var {input[2]} \
+            --output {output[0]} \
+            --label_idx {params.idx}
+        '''
+
