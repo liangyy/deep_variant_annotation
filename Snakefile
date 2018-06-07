@@ -9,7 +9,7 @@
 # 2. sequence --> input (HDF5 one-hot coding of sequence)
 # 3. input --> score
 # 4. score --> output (chr  pos0 pos1  a1  a2  score1  score2)
-# input format: chr  pos0 pos1  a1  a2 (delimiter = '\t', allele is relative to reference)
+# input format (in TXT): chr  pos0 pos1  a1  a2 (delimiter = '\t', allele is relative to reference)
 
 
 rule all:
@@ -88,8 +88,10 @@ rule input2score:
         config['pred_model']['path']
     output:
         temp('output/{name}/raw_score.{type}.hdf5')
+    log:
+        'output/{name}/raw_score.{type}.log'
     shell:
-        'python scripts/input2score.py --data {input[0]} --model {input[1]} --output {output[0]}'
+        'python scripts/input2score.py --data {input[0]} --model {input[1]} --output {output[0]} > {log}'
 
 rule score2output:
     input:
@@ -109,4 +111,3 @@ rule score2output:
             --output {output[0]} \
             --label_idx {params.idx}
         '''
-
