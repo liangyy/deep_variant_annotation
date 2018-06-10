@@ -1,0 +1,15 @@
+out_prefix: 'zhongshan-fantomFetalBrain'
+var_list: '/project2/xinhe/yanyul/deep_variant/zhongshan/combined_061018.txt'
+pred_model:
+  path: '/scratch/midway2/xinhe/repo/deep_variant/train_deepsea/model/DeepSEA-fantomFetalBrain_logistic.best.hdf5'
+  label:
+    fantomFetalBrain: 1
+reference_genome: '/project2/xinhe/yanyul/databases/hg19/hg19.fa'
+
+
+##### some default setup #####
+#### usually don't change ####
+check_allele: True
+design: '499-1-500'
+##############################
+##############################
