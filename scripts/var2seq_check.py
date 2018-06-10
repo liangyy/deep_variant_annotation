@@ -38,7 +38,7 @@ elif args.ifcheck == False:
             name = line[1]
             (chrm, start, end, a1, a2) = name.split('@')
             ref_char = seq[length_before].upper()
-            good_ref_out.write('\t'.join((seq, name)) + '\n')
+            good_ref_out.write('\t'.join((seq[:args.length_before] + a1 + seq[args.length_after:], name)) + '\n')
             good_alt_out.write('\t'.join(seq[:args.length_before] + a2 + seq[args.length_after:], name) + '\n')
 bad_out.close()
 good_ref_out.close()
