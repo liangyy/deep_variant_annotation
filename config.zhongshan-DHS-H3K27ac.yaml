@@ -1,0 +1,16 @@
+out_prefix: 'zhongshan-atac053018'
+var_list: '/project2/xinhe/yanyul/deep_variant/zhongshan/combined_061018.txt'
+pred_model:
+  path:
+    '/project2/xinhe/yanyul/deep_variant/yanyu/deep_brain/my_train/keras_deepsea_with_040417_2_42_head.hdf5'
+  label:
+    FetalBrainDHS: 1
+    FetalBrainH3K27ac: 4
+reference_genome: '/project2/xinhe/yanyul/databases/hg19/hg19.fa'
+
+##### some default setup #####
+#### usually don't change ####
+check_allele: True
+design: '499-1-500'
+##############################
+##############################
