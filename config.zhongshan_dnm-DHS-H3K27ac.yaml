@@ -1,5 +1,5 @@
-out_prefix: 'zhongshan-DHS-H3K27ac'
-var_list: '/project2/xinhe/yanyul/deep_variant/zhongshan/combined_061018.txt'
+out_prefix: 'zhongshan_dnm-DHS-H3K27ac'
+var_list: '/project2/xinhe/zhongshan/forDeepSea/Yuen_Simons_DNM_comb.bed'
 pred_model:
   path:
     '/project2/xinhe/yanyul/deep_variant/yanyu/deep_brain/my_train/keras_deepsea_with_040417_2_42_head.hdf5'
