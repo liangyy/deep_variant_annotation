@@ -14,8 +14,8 @@ parser.add_argument('--output')
 args = parser.parse_args()
 
 import os
-# os.environ['THEANO_FLAGS'] = "device=gpu"
-# os.environ['floatX'] = 'float32'
+os.environ['THEANO_FLAGS'] = "device=gpu"
+os.environ['floatX'] = 'float32'
 
 from keras.models import load_model
 import h5py
