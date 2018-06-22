@@ -44,3 +44,7 @@ $ source activate deepvarpred_test
 ## Running on RCC
 
 See an example `sbatch` at `sbatch/test.sbatch`. To use `sinteractive` follows similar idea.
+
+## About the model
+
+Currently, the models pre-trained by [`deep_variant`](https://github.com/liangyy/deep_variant/tree/code) are gathered at `/project2/xinhe/DeepVariantAnnotation/models`.
