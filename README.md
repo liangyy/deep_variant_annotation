@@ -45,6 +45,31 @@ $ source activate deepvarpred_test
 
 See an example `sbatch` at `sbatch/test.sbatch`. To use `sinteractive` follows similar idea.
 
+## Setup and run from docker
+
+First, [download and install docker](https://www.docker.com/community-edition) if needed. Then set command-line alias `docker-deepan`:
+
+```bash
+alias docker-deepann="docker run --rm --security-opt label:disable -t -h deepann -P -w $PWD -v $PWD:$PWD -u $UID:${GROUPS[0]} -e HOME=/home/$USER -e USER=$USER gaow/deepann"
+```
+
+To run this image:
+
+```
+docker-deepann snakemake --snakefile /opt/deepann/Snakefile --configfile config.yaml
+```
+
+### Developer's notes
+
+To build and push the image to dockerhub for repeated use:
+
+```
+docker build -t gaow/deepann .
+docker push gaow/deepann
+```
+
+Replace `gaow/deepann` with your dockerhub username.
+
 ## About the model
 
 Currently, the models pre-trained by [`deep_variant`](https://github.com/liangyy/deep_variant/tree/code) are gathered at `/project2/xinhe/DeepVariantAnnotation/models`.
