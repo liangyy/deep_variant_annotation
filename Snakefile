@@ -21,6 +21,7 @@ rule all:
 design = config['design'].split('-')
 chunk_before = int(design[0])
 chunk_after = int(design[-1])
+script_dir = config['script_dir'] if 'script_dir' in config else 'scripts'
 
 rule var2seq_var2region:
     input:
@@ -67,7 +68,7 @@ rule var2seq_check:
     params:
         ifcheck = config['check_allele']
     shell:
-        'python scripts/var2seq_check.py \
+        'python {script_dir}/var2seq_check.py \
             --input {input[0]} \
             --output_prefix output/{wildcards.name}/check \
             --length_before {chunk_before} \
@@ -80,7 +81,7 @@ rule seq2input:
     output:
         temp('output/{name}/input.{type}.hdf5')
     shell:
-        'python scripts/seq2input.py --seq_file {input[0]} --out_name {output[0]}'
+        'python {script_dir}/seq2input.py --seq_file {input[0]} --out_name {output[0]}'
 
 rule input2score:
     input:
@@ -91,7 +92,7 @@ rule input2score:
     log:
         'output/{name}/raw_score.{type}.log'
     shell:
-        'python scripts/input2score.py --data {input[0]} --model {input[1]} --output {output[0]} > {log}'
+        'python {script_dir}/input2score.py --data {input[0]} --model {input[1]} --output {output[0]} > {log}'
 
 rule score2output:
     input:
@@ -104,7 +105,7 @@ rule score2output:
         idx = lambda wildcards: config['pred_model']['label'][wildcards.label]
     shell:
         '''
-        python scripts/score2output.py \
+        python {script_dir}/score2output.py \
             --score_ref {input[0]} \
             --score_alt {input[1]} \
             --var {input[2]} \
