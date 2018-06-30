@@ -14,7 +14,8 @@
 
 rule all:
     input:
-        [ 'output/{name}/output__{label}.bed.gz'.format(name = config['out_prefix'], label = l) for l in list(config['pred_model']['label']) ]
+        [ '{output_dir}/{name}/output__{label}.bed.gz'.format(name = config['out_prefix'], output_dir = config['out_dir'] if 'out_dir' in config else 'output', label = l)
+          for l in list(config['pred_model']['label']) ]
 
 
 
@@ -27,7 +28,7 @@ rule var2seq_var2region:
     input:
         config['var_list']
     output:
-        temp('output/{name}/var2region.bed')
+        temp('{output_dir}/{name}/var2region.bed')
     params:
         cb = chunk_before,
         ca = chunk_after
@@ -49,58 +50,58 @@ rule var2seq_var2region:
 
 rule var2seq_region2seq:
     input:
-        'output/{name}/var2region.bed',
+        '{output_dir}/{name}/var2region.bed',
         config['reference_genome']
     output:
-        temp('output/{name}/region2seq.tab')
+        temp('{output_dir}/{name}/region2seq.tab')
     log:
-        'output/{name}/region2seq.log'
+        '{output_dir}/{name}/region2seq.log'
     shell:
         'bedtools getfasta -fi {input[1]} -bed {input[0]} -fo {output[0]} -name -tab 2> {log}'
 
 rule var2seq_check:
     input:
-        'output/{name}/region2seq.tab'
+        '{output_dir}/{name}/region2seq.tab'
     output:
-        temp('output/{name}/check.passed.REF.tab.gz'),
-        temp('output/{name}/check.passed.ALT.tab.gz'),
-        'output/{name}/check.NOTpassed.txt'
+        temp('{output_dir}/{name}/check.passed.REF.tab.gz'),
+        temp('{output_dir}/{name}/check.passed.ALT.tab.gz'),
+        '{output_dir}/{name}/check.NOTpassed.txt'
     params:
         ifcheck = config['check_allele']
     shell:
         'python {script_dir}/var2seq_check.py \
             --input {input[0]} \
-            --output_prefix output/{wildcards.name}/check \
+            --output_prefix {wildcards.output_dir}/{wildcards.name}/check \
             --length_before {chunk_before} \
             --length_after {chunk_after} \
             --ifcheck {params.ifcheck}'
 
 rule seq2input:
     input:
-        'output/{name}/check.passed.{type}.tab.gz'
+        '{output_dir}/{name}/check.passed.{type}.tab.gz'
     output:
-        temp('output/{name}/input.{type}.hdf5')
+        temp('{output_dir}/{name}/input.{type}.hdf5')
     shell:
         'python {script_dir}/seq2input.py --seq_file {input[0]} --out_name {output[0]}'
 
 rule input2score:
     input:
-        'output/{name}/input.{type}.hdf5',
+        '{output_dir}/{name}/input.{type}.hdf5',
         config['pred_model']['path']
     output:
-        temp('output/{name}/raw_score.{type}.hdf5')
+        temp('{output_dir}/{name}/raw_score.{type}.hdf5')
     log:
-        'output/{name}/raw_score.{type}.log'
+        '{output_dir}/{name}/raw_score.{type}.log'
     shell:
         'python {script_dir}/input2score.py --data {input[0]} --model {input[1]} --output {output[0]} > {log}'
 
 rule score2output:
     input:
-        'output/{name}/raw_score.REF.hdf5',
-        'output/{name}/raw_score.ALT.hdf5',
-        'output/{name}/check.passed.REF.tab.gz'
+        '{output_dir}/{name}/raw_score.REF.hdf5',
+        '{output_dir}/{name}/raw_score.ALT.hdf5',
+        '{output_dir}/{name}/check.passed.REF.tab.gz'
     output:
-        'output/{name}/output__{label}.bed.gz'
+        '{output_dir}/{name}/output__{label}.bed.gz'
     params:
         idx = lambda wildcards: config['pred_model']['label'][wildcards.label]
     shell:
