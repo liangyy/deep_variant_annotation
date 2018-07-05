@@ -113,3 +113,8 @@ rule score2output:
             --output {output[0]} \
             --label_idx {params.idx}
         '''
+
+rule all_gpu:
+    input:
+        '{output_dir}/{name}/raw_score.ALT.hdf5'.format(name = config['out_prefix'], output_dir = config['out_dir'] if 'out_dir' in config else 'output'),
+        '{output_dir}/{name}/raw_score.REF.hdf5'.format(name = config['out_prefix'], output_dir = config['out_dir'] if 'out_dir' in config else 'output')
