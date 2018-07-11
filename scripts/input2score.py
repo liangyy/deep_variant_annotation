@@ -10,7 +10,7 @@ parser.add_argument('--data', help='''
 	HDF5 file where input data is saved in x dataset and the dimension
     is (nsamples, window_size, 4)
 ''')
-parser.add_argument('--chunk_size', default=1e5, type=int)
+parser.add_argument('--chunk_size', default=100000, type=int)
 parser.add_argument('--output')
 args = parser.parse_args()
 

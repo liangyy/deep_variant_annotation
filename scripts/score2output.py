@@ -22,13 +22,14 @@ import gzip
 
 def read_data(filename):
     yh = h5py.File(filename, 'r')
-    yp = yh['y_pred'][()]
-    yh.close()
-    return yp
+    yp = yh.get('y_pred')
+    # yp = yh['y_pred'][()]
+    # yh.close()
+    return (yp, yh)
 
-yref = read_data(args.score_ref)
+(yref, yh1) = read_data(args.score_ref)
 yref = yref[:, args.label_idx - 1]
-yalt = read_data(args.score_alt)
+(yalt, yh2) = read_data(args.score_alt)
 yalt = yalt[:, args.label_idx - 1]
 
 o = gzip.open(args.output, 'wt')
@@ -46,3 +47,5 @@ with gzip.open(args.var, 'rt') as f:
         i += 1
         o.write('\t'.join((chrm, start, end, a1, a2, str(ref), str(alt))) + '\n')
 o.close()
+yh1.close()
+yh2.close()
