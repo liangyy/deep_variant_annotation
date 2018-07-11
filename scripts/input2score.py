@@ -10,6 +10,7 @@ parser.add_argument('--data', help='''
 	HDF5 file where input data is saved in x dataset and the dimension
     is (nsamples, window_size, 4)
 ''')
+parser.add_argument('--chunk_size', default=1e5, type=int)
 parser.add_argument('--output')
 args = parser.parse_args()
 
@@ -33,7 +34,11 @@ xh.close()
 outfile = args.output
 
 print('Predicting on test sequences')
-y = model.predict(x, verbose=1)
+y = np.zeros((x.shape[0], model.output_shape[-1]))
+for i in range(0, x.shape[0], args.chunk_size):
+	x_sub = x[i : min(i + args.chunk_size, x.shape[0])]
+	y[i : i + args.chunk_size] = model.predict(x_sub, verbose=1)
+# y = model.predict(x, verbose=1)
 ny = int(y.shape[0] / 2)
 y = (y[:ny] + y[ny:]) / 2
 out = h5py.File(outfile, 'w')
