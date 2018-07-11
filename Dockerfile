@@ -27,7 +27,8 @@ RUN pip3 install pandas==0.22.0 h5py snakemake --no-cache-dir
 RUN sed -i.bak -e '84d' /usr/local/lib/python3.6/dist-packages/numpy/core/include/numpy/ndarraytypes.h
 
 ENV VERSION master
-RUN curl -L https://github.com/liangyy/deep_variant_annotation/archive/$VERSION.zip -o $VERSION.zip \
+ARG	DUMMY=unknown
+RUN DUMMY=${DUMMY} curl -L https://github.com/liangyy/deep_variant_annotation/archive/$VERSION.zip -o $VERSION.zip \
     && unzip $VERSION.zip && cd deep_variant_annotation-$VERSION && mkdir /opt/deepann \
     && mv Snakefile scripts/* /opt/deepann && rm -rf /tmp/*
 

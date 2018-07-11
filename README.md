@@ -64,7 +64,7 @@ docker-deepann snakemake --snakefile /opt/deepann/Snakefile --configfile config.
 To build and push the image to dockerhub for repeated use:
 
 ```
-docker build -t gaow/deepann .
+docker build --build-arg DUMMY=`date +%s` -t gaow/deepann .
 docker push gaow/deepann
 ```
 
