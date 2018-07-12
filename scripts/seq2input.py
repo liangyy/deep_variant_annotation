@@ -32,7 +32,7 @@ cmd = '''zcat {file} | wc -l'''.format(file=args.seq_file)
 length = mySubprocess(cmd, args.debug)
 if args.debug is True:
     sys.exit()
-huge_array = np.zeros((int(length), args.window, 4), np.bool_)
+huge_array = np.zeros((int(length), args.window, 4), np.uint8)
 encode = {'A': 0, 'T': 3, 'G': 1, 'C': 2}
 
 counter = 0
@@ -45,12 +45,11 @@ with gzip.open(args.seq_file, 'rt') as infile:
                 continue
             else:
                 digit_seq[i, encode[seq[i]]] = 1
-        huge_array[counter] = digit_seq
+        huge_array[counter] = np.uint8(digit_seq)
         counter += 1
 
-huge_array_flip = huge_array[:,::-1,::-1];
+huge_array_flip = huge_array[:,::-1,::-1]
 huge_array = np.concatenate([huge_array, huge_array_flip],axis=0)
-huge_array = huge_array.astype(np.uint8)
 out = args.out_name
 f = h5py.File(out, 'w')
 f.create_dataset('trainxdata', data=huge_array)
